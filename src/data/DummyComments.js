@@ -1,0 +1,42 @@
+export const comments = [
+  {
+    id: 1,
+    blogId: 1,
+    authorName: "สมชาย ใจดี",
+    content: "บทความนี้ดีมากเลยครับ อ่านเข้าใจง่าย อยากให้มีตัวอย่างเพิ่มเติมอีก",
+    createdAt: "2026-06-03",
+    status: "approved",
+  },
+  {
+    id: 2,
+    blogId: 1,
+    authorName: "มาลี รักเรียน",
+    content: "ขอบคุณมากนะคะ เพิ่งหัดเรียน React อยู่พอดีเลย ช่วยได้เยอะมากเลยค่ะ",
+    createdAt: "2026-06-05",
+    status: "approved",
+  },
+  {
+    id: 3,
+    blogId: 1,
+    authorName: "ธนภัทร โค้ดดี",
+    content: "เนื้อหาครบถ้วนดีมากครับ หวังว่าจะมีบทความต่อไปเร็วๆ นี้",
+    createdAt: "2026-06-07",
+    status: "approved",
+  },
+  {
+    id: 4,
+    blogId: 2,
+    authorName: "วรรณา เทคโน",
+    content: "อธิบายได้ชัดเจนมากเลยค่ะ ทำให้เข้าใจการทำงานของ Node.js มากขึ้น",
+    createdAt: "2026-06-11",
+    status: "approved",
+  },
+  {
+    id: 5,
+    blogId: 2,
+    authorName: "ประสิทธิ์ แบ็กเอนด์",
+    content: "ดีมากครับ ได้เทคนิคใหม่ๆ ไปใช้งานจริงได้เลย",
+    createdAt: "2026-06-12",
+    status: "approved",
+  },
+];
