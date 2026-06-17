@@ -1,5 +1,5 @@
 import { SearchX } from "lucide-react";
-import BlogCard from "./blogCard";
+import BlogCard from "./BlogCard";
 
 export default function BlogList({ blogs }) {
   if (blogs.length === 0) {
