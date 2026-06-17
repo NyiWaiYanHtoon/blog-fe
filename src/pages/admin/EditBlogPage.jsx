@@ -1,6 +1,6 @@
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useState } from "react";
-import { blogs } from "../../data/dummyBlogs";
+import { blogs } from "../../data/DummyBlogs";
 import BlogForm from "../../components/blogs/BlogForm";
 
 export default function EditBlogPage() {

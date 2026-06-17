@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { blogs } from "../data/dummyBlogs";
-import BlogList from "../components/blogs/blogList";
-import BlogSearch from "../components/blogs/blogSearch";
-import Pagination from "../components/common/pagination";
+import { blogs } from "../data/DummyBlogs";
+import BlogList from "../components/blogs/BlogList";
+import BlogSearch from "../components/blogs/BlogSearch";
+import Pagination from "../components/common/Pagination";
 
 const BLOGS_PER_PAGE = 10;
 

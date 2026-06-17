@@ -10,7 +10,7 @@ import {
   Bell,
   LogOut
 } from "lucide-react";
-import { blogs } from "../../data/dummyBlogs";
+import { blogs } from "../../data/DummyBlogs";
 import { comments } from "../../data/DummyComments";
 import { useAuth } from "../../context/AuthContext";
 

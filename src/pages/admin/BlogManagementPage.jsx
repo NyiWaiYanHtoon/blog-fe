@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { blogs as initialBlogs } from "../../data/dummyBlogs";
+import { blogs as initialBlogs } from "../../data/DummyBlogs";
 import { PlusCircle } from "lucide-react";
 
 export default function BlogManagementPage() {

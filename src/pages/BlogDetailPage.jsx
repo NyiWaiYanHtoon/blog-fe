@@ -1,9 +1,9 @@
 import { useParams, Link } from "react-router-dom";
-import { blogs } from "../data/dummyBlogs";
+import { blogs } from "../data/DummyBlogs";
 import { comments as allComments } from "../data/DummyComments";
 import BlogGallery from "../components/blogs/BlogGallaery"
 import CommentList from "../components/blogs/CommentList";
-import CommentForm from "../components/blogs/commentForm";
+import CommentForm from "../components/blogs/CommentForm";
 
 export default function BlogDetailPage() {
   const { slug } = useParams();

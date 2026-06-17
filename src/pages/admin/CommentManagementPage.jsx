@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { comments as initialComments } from "../../data/DummyComments";
-import { blogs } from "../../data/dummyBlogs";
-import { Link } from "react-router-dom";
+import { blogs } from "../../data/DummyBlogs";
 
 const STATUS_TABS = [
   { value: "all", label: "All" },

@@ -5,8 +5,8 @@ import PublicLayout from "../layouts/PublicLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
 import BlogListPage from "../pages/BlogListPage";
-import BlogDetailPage from "../pages/blogDetailPage";
-import LoginPage from "../pages/loginPage";
+import BlogDetailPage from "../pages/BlogDetailPage";
+import LoginPage from "../pages/LoginPage";
 
 import DashboardPage from "../pages/admin/DashboardPage";
 import BlogManagementPage from "../pages/admin/BlogManagementPage";
