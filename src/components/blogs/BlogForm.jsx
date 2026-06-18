@@ -23,14 +23,19 @@ export default function BlogForm({
   const [slugManual, setSlugManual] = useState(!!initialData.slug);
 
   // Cover image — can be an existing URL (string) or a new File
-  const [coverImage, setCoverImage] = useState(initialData.cover_image_url ?? null);
+  const [coverImage, setCoverImage] = useState(
+    initialData.cover_image_url ?? null,
+  );
   const [coverFile, setCoverFile] = useState(null);
-  const [coverPreview, setCoverPreview] = useState(initialData.cover_image_url ?? null);
+  const [coverPreview, setCoverPreview] = useState(
+    initialData.cover_image_url ?? null,
+  );
 
   // Gallery images — mix of existing URLs and new Files
   const [galleryFiles, setGalleryFiles] = useState([]); // new File objects
   const [galleryPreviews, setGalleryPreviews] = useState(
-    initialData.images?.map((img) => ({ url: img.image_url, file: null })) ?? []
+    initialData.images?.map((img) => ({ url: img.image_url, file: null })) ??
+      [],
   );
 
   const coverInputRef = useRef();
@@ -55,7 +60,7 @@ export default function BlogForm({
     setCoverFile(null);
     setCoverImage(null);
     setCoverPreview(null);
-    coverInputRef.current.value = '';
+    coverInputRef.current.value = "";
   };
 
   // Gallery handler
@@ -70,7 +75,7 @@ export default function BlogForm({
     }));
 
     setGalleryPreviews((prev) => [...prev, ...newPreviews]);
-    galleryInputRef.current.value = '';
+    galleryInputRef.current.value = "";
   };
 
   const removeGalleryImage = (index) => {
@@ -116,7 +121,6 @@ export default function BlogForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-
       {/* Title */}
       <Field id="title" label="Title" error={errors.title}>
         <input
@@ -130,21 +134,26 @@ export default function BlogForm({
 
       {/* Slug */}
       <Field id="slug" label="URL Slug" error={errors.slug}>
-        <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">
-            /blog/
-          </span>
-          <input
-            id="slug"
-            value={slug}
-            onChange={(e) => { setSlug(e.target.value); setSlugManual(true); }}
-            placeholder="how-to-learn-react"
-            className={`${inputClass(errors.slug)} pl-14`}
-          />
-        </div>
-        {!slugManual && (
-          <p className="text-xs text-gray-400 mt-1">Auto-generated from title. Edit to override.</p>
-        )}
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">
+              /blog/
+            </span>
+            <input
+              id="slug"
+              value={slug}
+              onChange={(e) => {
+                setSlug(e.target.value);
+                setSlugManual(true);
+              }}
+              placeholder="how-to-learn-react"
+              className={`${inputClass(errors.slug)} pl-14`}
+            />
+          </div>
+          {!slugManual && (
+            <p className="text-xs text-gray-400 mt-1">
+              Auto-generated from title. Edit to override.
+            </p>
+          )}
       </Field>
 
       {/* Content */}
@@ -170,7 +179,11 @@ export default function BlogForm({
         />
         {coverPreview ? (
           <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
-            <img src={coverPreview} alt="Cover" className="w-full h-full object-cover" />
+            <img
+              src={coverPreview}
+              alt="Cover"
+              className="w-full h-full object-cover"
+            />
             <button
               type="button"
               onClick={removeCover}
@@ -186,18 +199,31 @@ export default function BlogForm({
             className="w-full aspect-video rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-gray-500"
           >
             <Upload className="w-6 h-6" />
-            <span className="text-sm font-medium">Click to upload cover image</span>
+            <span className="text-sm font-medium">
+              Click to upload cover image
+            </span>
             <span className="text-xs">JPEG, PNG, WebP — max 5MB</span>
           </button>
         )}
       </Field>
 
       {/* Gallery Images */}
-      <Field id="gallery" label={`Gallery Images (${galleryPreviews.length}/6)`} required={false}>
+      <Field
+        id="gallery"
+        label={`Gallery Images (${galleryPreviews.length}/6)`}
+        required={false}
+      >
         <div className="grid grid-cols-3 gap-3">
           {galleryPreviews.map((item, index) => (
-            <div key={index} className="relative aspect-video rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
-              <img src={item.url} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
+            <div
+              key={index}
+              className="relative aspect-video rounded-xl overflow-hidden border border-gray-200 bg-gray-50"
+            >
+              <img
+                src={item.url}
+                alt={`Gallery ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
               <button
                 type="button"
                 onClick={() => removeGalleryImage(index)}
@@ -255,16 +281,19 @@ export default function BlogForm({
 }
 
 const Field = ({ id, label, error, required = true, children }) => (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1.5">
-        {label} {required && <span className="text-coral">*</span>}
-      </label>
-      {children}
-      {error && (
-        <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-          {error}
-        </p>
-      )}
-    </div>
-  );
+  <div>
+    <label
+      htmlFor={id}
+      className="block text-sm font-medium text-gray-700 mb-1.5"
+    >
+      {label} {required && <span className="text-coral">*</span>}
+    </label>
+    {children}
+    {error && (
+      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+        {error}
+      </p>
+    )}
+  </div>
+);

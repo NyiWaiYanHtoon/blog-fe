@@ -13,9 +13,19 @@ export default function BlogListPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+
   useEffect(() => {
     fetchBlogs();
-  }, [currentPage, search]);
+  }, [currentPage, debouncedSearch]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400); // wait 400ms
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const fetchBlogs = async () => {
     try {
@@ -48,6 +58,12 @@ export default function BlogListPage() {
 
       <BlogSearch search={search} setSearch={handleSearch} />
 
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+
       <div className="mt-8">
         {loading ? (
           <div className="flex justify-center py-20">
@@ -57,12 +73,6 @@ export default function BlogListPage() {
           <BlogList blogs={blogs} />
         )}
       </div>
-
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
     </div>
   );
 }

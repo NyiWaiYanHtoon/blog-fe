@@ -1,4 +1,5 @@
 export default function Pagination({ currentPage = 1, totalPages = 1, onPageChange }) {
+  console.log("totalpages: ", totalPages)
   if (totalPages <= 1) return null;
 
   return (

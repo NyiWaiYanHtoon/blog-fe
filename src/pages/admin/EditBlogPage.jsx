@@ -1,9 +1,9 @@
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import BlogForm from "../../components/blogs/BlogForm";
 import { adminGetBlogById, adminUpdateBlog } from "../../services/adminApi";
-import { Loader2 } from "lucide-react";
+import { uploadImage } from "../../services/uploadApi";
 
 const SLUG_REGEX = /^[a-z0-9-]+$/;
 
@@ -38,24 +38,39 @@ export default function EditBlogPage() {
   };
 
   const handleSubmit = async (data) => {
+    // Handle cover image
+    let cover_image_url = data.existingCoverUrl ?? null;
+    if (data.coverFile) {
+      cover_image_url = await uploadImage(data.coverFile);
+    }
+  
+    // Handle gallery images — upload new ones, keep existing URLs
+    const imageUrls = await Promise.all(
+      data.galleryPreviews.map(async (item) => {
+        if (item.file) {
+          return await uploadImage(item.file);
+        }
+        return item.url; // existing URL, keep as is
+      })
+    );
+
     await adminUpdateBlog(id, {
       title: data.title,
       content: data.content,
+      cover_image_url,
+      images: imageUrls,
     });
+
     navigate("/admin/blogs");
   };
 
   const handleSlugSave = async () => {
-    if (!slugValue.trim()) {
-      setSlugError("Slug cannot be empty.");
-      return;
-    }
+    if (!slugValue.trim()) { setSlugError("Slug cannot be empty."); return; }
     if (!SLUG_REGEX.test(slugValue)) {
       setSlugError("Slug may only contain lowercase letters, numbers, and hyphens.");
       return;
     }
     setSlugError("");
-
     try {
       setSlugSaving(true);
       await adminUpdateBlog(id, { slug: slugValue });
@@ -89,7 +104,6 @@ export default function EditBlogPage() {
 
   return (
     <div>
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-navy">Edit blog</h1>
         <p className="text-sm text-gray-400 mt-0.5 truncate max-w-sm">{blog.title}</p>
@@ -116,9 +130,7 @@ export default function EditBlogPage() {
                 value={slugValue}
                 onChange={(e) => { setSlugValue(e.target.value); setSlugError(""); setSlugSaved(false); }}
                 className={`w-full pl-14 pr-4 py-3 bg-stone-50 border rounded-xl text-sm font-mono text-gray-700 focus:outline-none focus:ring-2 transition ${
-                  slugError
-                    ? "border-red-300 focus:ring-red-200"
-                    : "border-gray-200 focus:ring-coral/30 focus:border-coral"
+                  slugError ? "border-red-300 focus:ring-red-200" : "border-gray-200 focus:ring-coral/30 focus:border-coral"
                 }`}
               />
             </div>
@@ -128,23 +140,12 @@ export default function EditBlogPage() {
             onClick={handleSlugSave}
             disabled={slugSaving}
             className={`shrink-0 inline-flex items-center gap-2 px-4 py-3 text-sm font-semibold rounded-xl transition-colors ${
-              slugSaved
-                ? "bg-green-100 text-green-700"
-                : "bg-navy text-white hover:bg-navy/90 disabled:opacity-60"
+              slugSaved ? "bg-green-100 text-green-700" : "bg-zinc-900 text-white hover:bg-navy/90 disabled:opacity-60"
             }`}
           >
-            {slugSaving ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
-            ) : slugSaved ? (
-              "Saved ✓"
-            ) : (
-              "Update slug"
-            )}
+            {slugSaving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : slugSaved ? "Saved ✓" : "Quick slug update"}
           </button>
         </div>
-        <p className="text-xs text-amber-500 mt-2">
-          ⚠ Changing the slug will break any existing links to this article.
-        </p>
       </div>
 
       {/* Blog content form */}

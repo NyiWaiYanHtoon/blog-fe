@@ -10,7 +10,7 @@ export default function BlogGallery({ images }) {
         {images.map((img, index) => (
           <div key={img} className="overflow-hidden rounded-xl aspect-video bg-gray-100">
             <img
-              src={img}
+              src={img.image_url}
               alt={`Gallery image ${index + 1}`}
               className="h-full w-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
             />
