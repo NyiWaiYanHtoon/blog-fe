@@ -30,7 +30,7 @@ export default function CommentList({ comments }) {
         });
 
         // Initials avatar from author name (supports Thai — just take first char)
-        const initial = comment.authorName.trim().charAt(0).toUpperCase();
+        const initial = comment.author_name.trim().charAt(0).toUpperCase();
 
         return (
           <div

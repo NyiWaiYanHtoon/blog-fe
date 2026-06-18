@@ -15,7 +15,7 @@ export default function Pagination({ currentPage = 1, totalPages = 1, onPageChan
       </button>
 
       <span className="px-4 py-2 text-sm text-gray-500">
-        Page <span className="font-semibold text-navy">{currentPage}</span> of {totalPages}
+        Page <span className="font-semibold text-zinc-900">{currentPage}</span> of {totalPages}
       </span>
 
       <button

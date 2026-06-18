@@ -13,7 +13,7 @@ export default function BlogCard({ blog }) {
       {/* Cover image */}
       <div className="overflow-hidden h-52">
         <img
-          src={blog.coverImage}
+          src={blog.cover_image_url}
           alt={blog.title}
           className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
@@ -35,7 +35,7 @@ export default function BlogCard({ blog }) {
             <span>{formattedDate}</span>
             <span className="flex items-center gap-1">
               <Eye className="w-3.5 h-3.5" />
-              {blog.viewCount.toLocaleString()}
+              {blog.view_count.toLocaleString()}
             </span>
           </div>
 

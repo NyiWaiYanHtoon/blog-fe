@@ -1,41 +1,45 @@
 import { useState } from "react";
+import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { submitComment } from "../../services/blogApi";
 
 const THAI_REGEX = /^[ก-๙0-9\s]+$/;
 
-export default function CommentForm() {
+export default function CommentForm({ slug }) {
   const [name, setName] = useState("");
   const [comment, setComment] = useState("");
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!name.trim()) {
-      setError("Please enter your name.");
-      return;
-    }
-    if (!comment.trim()) {
-      setError("Please enter a comment.");
-      return;
-    }
+    if (!name.trim()) { setError("Please enter your name."); return; }
+    if (!comment.trim()) { setError("Please enter a comment."); return; }
     if (!THAI_REGEX.test(comment.trim())) {
       setError("Comment must contain only Thai characters and/or numbers.");
       return;
     }
 
-    setSubmitted(true);
-    setName("");
-    setComment("");
+    try {
+      setLoading(true);
+      //submit comment to backend
+      await submitComment(slug, { authorName: name, content: comment });
+      setSubmitted(true);
+      setName("");
+      setComment("");
+    } catch (err) {
+      setError("Failed to submit comment. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
     return (
       <div className="mt-10 p-5 bg-green-50 border border-green-200 rounded-xl text-center">
-        <svg className="w-8 h-8 text-green-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
+        <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
         <p className="text-sm font-medium text-green-700">Comment submitted!</p>
         <p className="text-xs text-green-600 mt-1">It will appear after admin approval.</p>
         <button
@@ -68,7 +72,9 @@ export default function CommentForm() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
             Comment <span className="text-coral">*</span>
-            <span className="ml-2 text-xs font-normal text-gray-400">(Thai characters and numbers only)</span>
+            <span className="ml-2 text-xs font-normal text-gray-400">
+              (Thai characters and numbers only)
+            </span>
           </label>
           <textarea
             value={comment}
@@ -81,19 +87,24 @@ export default function CommentForm() {
 
         {error && (
           <p className="text-sm text-red-500 flex items-center gap-1.5">
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+            <AlertCircle className="w-4 h-4 shrink-0" />
             {error}
           </p>
         )}
 
         <button
           type="submit"
-          className="px-6 py-2.5 bg-navy text-white text-sm font-semibold rounded-xl hover:bg-navy/90 transition-colors"
+          disabled={loading}
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-zinc-900 text-white text-sm font-semibold rounded-xl hover:bg-navy/90 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
         >
-          Submit comment
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+              Submitting...
+            </>
+          ) : (
+            "Submit comment"
+          )}
         </button>
       </form>
     </section>

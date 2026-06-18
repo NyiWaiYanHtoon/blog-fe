@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Save, AlertCircle, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Save, AlertCircle, Loader2, Upload, X, ImagePlus } from "lucide-react";
 
 const SLUG_REGEX = /^[a-z0-9-]+$/;
 
@@ -19,18 +19,63 @@ export default function BlogForm({
 }) {
   const [title, setTitle] = useState(initialData.title ?? "");
   const [slug, setSlug] = useState(initialData.slug ?? "");
-  const [summary, setSummary] = useState(initialData.summary ?? "");
   const [content, setContent] = useState(initialData.content ?? "");
   const [slugManual, setSlugManual] = useState(!!initialData.slug);
+
+  // Cover image — can be an existing URL (string) or a new File
+  const [coverImage, setCoverImage] = useState(initialData.cover_image_url ?? null);
+  const [coverFile, setCoverFile] = useState(null);
+  const [coverPreview, setCoverPreview] = useState(initialData.cover_image_url ?? null);
+
+  // Gallery images — mix of existing URLs and new Files
+  const [galleryFiles, setGalleryFiles] = useState([]); // new File objects
+  const [galleryPreviews, setGalleryPreviews] = useState(
+    initialData.images?.map((img) => ({ url: img.image_url, file: null })) ?? []
+  );
+
+  const coverInputRef = useRef();
+  const galleryInputRef = useRef();
+
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  // Auto-generate slug from title unless manually edited
   useEffect(() => {
-    if (!slugManual && title) {
-      setSlug(generateSlug(title));
-    }
+    if (!slugManual && title) setSlug(generateSlug(title));
   }, [title, slugManual]);
+
+  // Cover image handler
+  const handleCoverChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setCoverFile(file);
+    setCoverPreview(URL.createObjectURL(file));
+  };
+
+  const removeCover = () => {
+    setCoverFile(null);
+    setCoverImage(null);
+    setCoverPreview(null);
+    coverInputRef.current.value = '';
+  };
+
+  // Gallery handler
+  const handleGalleryChange = (e) => {
+    const files = Array.from(e.target.files);
+    const remaining = 6 - galleryPreviews.length;
+    const toAdd = files.slice(0, remaining);
+
+    const newPreviews = toAdd.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+
+    setGalleryPreviews((prev) => [...prev, ...newPreviews]);
+    galleryInputRef.current.value = '';
+  };
+
+  const removeGalleryImage = (index) => {
+    setGalleryPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const validate = () => {
     const e = {};
@@ -38,7 +83,6 @@ export default function BlogForm({
     if (!slug.trim()) e.slug = "Slug is required.";
     else if (!SLUG_REGEX.test(slug))
       e.slug = "Slug may only contain lowercase letters, numbers, and hyphens.";
-    if (!summary.trim()) e.summary = "Summary is required.";
     if (!content.trim()) e.content = "Content is required.";
     return e;
   };
@@ -52,27 +96,16 @@ export default function BlogForm({
     }
     setErrors({});
     setSubmitting(true);
-    await onSubmit({ title, slug, summary, content });
+    await onSubmit({
+      title,
+      slug,
+      content,
+      coverFile,
+      existingCoverUrl: coverImage,
+      galleryPreviews, // parent handles uploading new files (file !== null)
+    });
     setSubmitting(false);
   };
-
-  const Field = ({ id, label, error, children }) => (
-    <div>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-gray-700 mb-1.5"
-      >
-        {label} <span className="text-coral">*</span>
-      </label>
-      {children}
-      {error && (
-        <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-          {error}
-        </p>
-      )}
-    </div>
-  );
 
   const inputClass = (hasError) =>
     `w-full px-4 py-3 bg-white border rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 transition ${
@@ -83,6 +116,7 @@ export default function BlogForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+
       {/* Title */}
       <Field id="title" label="Title" error={errors.title}>
         <input
@@ -103,31 +137,14 @@ export default function BlogForm({
           <input
             id="slug"
             value={slug}
-            onChange={(e) => {
-              setSlug(e.target.value);
-              setSlugManual(true);
-            }}
+            onChange={(e) => { setSlug(e.target.value); setSlugManual(true); }}
             placeholder="how-to-learn-react"
             className={`${inputClass(errors.slug)} pl-14`}
           />
         </div>
         {!slugManual && (
-          <p className="text-xs text-gray-400 mt-1">
-            Auto-generated from title. Edit to override.
-          </p>
+          <p className="text-xs text-gray-400 mt-1">Auto-generated from title. Edit to override.</p>
         )}
-      </Field>
-
-      {/* Summary */}
-      <Field id="summary" label="Summary" error={errors.summary}>
-        <textarea
-          id="summary"
-          value={summary}
-          onChange={(e) => setSummary(e.target.value)}
-          placeholder="A short description shown on the blog list..."
-          rows={2}
-          className={`${inputClass(errors.summary)} resize-none`}
-        />
       </Field>
 
       {/* Content */}
@@ -140,6 +157,77 @@ export default function BlogForm({
           rows={10}
           className={`${inputClass(errors.content)} resize-y`}
         />
+      </Field>
+
+      {/* Cover Image */}
+      <Field id="cover" label="Cover Image" required={false}>
+        <input
+          ref={coverInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handleCoverChange}
+          className="hidden"
+        />
+        {coverPreview ? (
+          <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+            <img src={coverPreview} alt="Cover" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={removeCover}
+              className="absolute top-2 right-2 p-1.5 bg-white rounded-lg shadow text-gray-500 hover:text-red-500 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => coverInputRef.current.click()}
+            className="w-full aspect-video rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-gray-500"
+          >
+            <Upload className="w-6 h-6" />
+            <span className="text-sm font-medium">Click to upload cover image</span>
+            <span className="text-xs">JPEG, PNG, WebP — max 5MB</span>
+          </button>
+        )}
+      </Field>
+
+      {/* Gallery Images */}
+      <Field id="gallery" label={`Gallery Images (${galleryPreviews.length}/6)`} required={false}>
+        <div className="grid grid-cols-3 gap-3">
+          {galleryPreviews.map((item, index) => (
+            <div key={index} className="relative aspect-video rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+              <img src={item.url} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeGalleryImage(index)}
+                className="absolute top-1.5 right-1.5 p-1 bg-white rounded-lg shadow text-gray-500 hover:text-red-500 transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+
+          {galleryPreviews.length < 6 && (
+            <button
+              type="button"
+              onClick={() => galleryInputRef.current.click()}
+              className="aspect-video rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors flex flex-col items-center justify-center gap-1.5 text-gray-400 hover:text-gray-500"
+            >
+              <ImagePlus className="w-5 h-5" />
+              <span className="text-xs font-medium">Add image</span>
+            </button>
+          )}
+        </div>
+        <input
+          ref={galleryInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          onChange={handleGalleryChange}
+          className="hidden"
+        />
+        <p className="text-xs text-gray-400 mt-2">Maximum 6 gallery images.</p>
       </Field>
 
       {/* Submit */}
@@ -165,3 +253,18 @@ export default function BlogForm({
     </form>
   );
 }
+
+const Field = ({ id, label, error, required = true, children }) => (
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1.5">
+        {label} {required && <span className="text-coral">*</span>}
+      </label>
+      {children}
+      {error && (
+        <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+          {error}
+        </p>
+      )}
+    </div>
+  );

@@ -1,24 +1,35 @@
-import { useState } from "react";
-import { blogs } from "../data/DummyBlogs";
+import { useState, useEffect } from "react";
 import BlogList from "../components/blogs/BlogList";
 import BlogSearch from "../components/blogs/BlogSearch";
 import Pagination from "../components/common/Pagination";
-
-const BLOGS_PER_PAGE = 10;
+import { getBlogs } from "../services/blogApi";
+import { Loader2 } from "lucide-react";
 
 export default function BlogListPage() {
+  const [blogs, setBlogs] = useState([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  const filteredBlogs = blogs.filter((blog) =>
-    blog.title.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    fetchBlogs();
+  }, [currentPage, search]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredBlogs.length / BLOGS_PER_PAGE));
-  const paginated = filteredBlogs.slice(
-    (currentPage - 1) * BLOGS_PER_PAGE,
-    currentPage * BLOGS_PER_PAGE
-  );
+  const fetchBlogs = async () => {
+    try {
+      setLoading(true);
+      const res = await getBlogs(currentPage, search);
+      setBlogs(res.data.data);
+      setTotalPages(res.data.pagination.totalPages);
+      setTotal(res.data.pagination.total);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (value) => {
     setSearch(value);
@@ -27,11 +38,10 @@ export default function BlogListPage() {
 
   return (
     <div>
-      {/* Page header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-navy">Articles</h1>
         <p className="text-gray-500 mt-1 text-sm">
-          {filteredBlogs.length} {filteredBlogs.length === 1 ? "article" : "articles"}
+          {total} {total === 1 ? "article" : "articles"}
           {search && ` matching "${search}"`}
         </p>
       </div>
@@ -39,7 +49,13 @@ export default function BlogListPage() {
       <BlogSearch search={search} setSearch={handleSearch} />
 
       <div className="mt-8">
-        <BlogList blogs={paginated} />
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+          </div>
+        ) : (
+          <BlogList blogs={blogs} />
+        )}
       </div>
 
       <Pagination

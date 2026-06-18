@@ -1,19 +1,24 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login("sample-token", { username });
-    navigate("/admin");
+    try {
+      await login(username, password);
+      navigate("/admin");
+    } catch (err) {
+      setError("Invalid username or password");
+    }
   };
 
   return (
@@ -23,7 +28,9 @@ export default function LoginPage() {
           <Link to="/" className="inline-block text-2xl font-bold text-navy">
             Dev<span className="text-coral">Blog</span>
           </Link>
-          <p className="text-gray-500 text-sm mt-2">Sign in to your admin panel</p>
+          <p className="text-gray-500 text-sm mt-2">
+            Sign in to your admin panel
+          </p>
         </div>
 
         <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm">
@@ -59,10 +66,21 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
+
+            {error && (
+              <p className="text-sm text-red-500 flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"
@@ -74,7 +92,10 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center mt-6">
-          <Link to="/" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+          <Link
+            to="/"
+            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+          >
             ← Back to blog
           </Link>
         </p>

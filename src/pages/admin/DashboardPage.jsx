@@ -1,5 +1,7 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
+  LayoutDashboard,
   BookOpen,
   BookCheck,
   FileEdit,
@@ -8,21 +10,47 @@ import {
   MessageSquareCheck,
   PlusCircle,
   Bell,
-  LogOut
+  LogOut,
 } from "lucide-react";
-import { blogs } from "../../data/DummyBlogs";
-import { comments } from "../../data/DummyComments";
+import { adminGetBlogs } from "../../services/adminApi";
+import { adminGetComments } from "../../services/adminApi";
 import { useAuth } from "../../context/AuthContext";
+import { Loader2 } from "lucide-react";
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
+  const [blogs, setBlogs] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [blogsRes, commentsRes] = await Promise.all([
+        adminGetBlogs(),
+        adminGetComments(),
+      ]);
+      setBlogs(blogsRes.data);
+      setComments(commentsRes.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const totalBlogs = blogs.length;
-  const publishedBlogs = blogs.filter((b) => b.is_published !== false).length;
+  const publishedBlogs = blogs.filter((b) => b.is_published).length;
   const draftBlogs = totalBlogs - publishedBlogs;
-  const totalViews = blogs.reduce((sum, b) => sum + b.viewCount, 0);
+  const totalViews = blogs.reduce((sum, b) => sum + b.view_count, 0);
   const pendingComments = comments.filter((c) => c.status === "pending").length;
-  const approvedComments = comments.filter((c) => c.status === "approved").length;
+  const approvedComments = comments.filter(
+    (c) => c.status === "approved",
+  ).length;
 
   const stats = [
     {
@@ -69,11 +97,22 @@ export default function DashboardPage() {
     },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex justify-center py-32">
+        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-3">
+          <div className="p-2 bg-navy/5 rounded-xl">
+            <LayoutDashboard className="w-5 h-5 text-navy" />
+          </div>
           <div>
             <h1 className="text-2xl font-bold text-navy">Dashboard</h1>
             <p className="text-sm text-gray-400 mt-0.5">
@@ -84,14 +123,13 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
-
         <button
           type="button"
           onClick={logout}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-navy text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors"
         >
           <LogOut className="w-4 h-4" />
-          Sign Out
+          Logout
         </button>
       </div>
 
@@ -133,7 +171,7 @@ export default function DashboardPage() {
             <Bell className="w-4 h-4" />
             Review comments
             {pendingComments > 0 && (
-              <span className="ml-1 bg-coral text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+              <span className="ml-1 text-red-500 bg-yellow-100 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                 {pendingComments}
               </span>
             )}
@@ -150,9 +188,15 @@ export default function DashboardPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400">Title</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400">Status</th>
-                <th className="text-right px-5 py-3 text-xs font-semibold text-gray-400">Views</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400">
+                  Title
+                </th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400">
+                  Status
+                </th>
+                <th className="text-right px-5 py-3 text-xs font-semibold text-gray-400">
+                  Views
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -161,27 +205,29 @@ export default function DashboardPage() {
                   key={blog.id}
                   className="border-b border-gray-50 last:border-0 hover:bg-stone-50 transition-colors"
                 >
-                  <td className="px-5 py-3 font-medium text-navy">{blog.title}</td>
+                  <td className="px-5 py-3 font-medium text-navy">
+                    {blog.title}
+                  </td>
                   <td className="px-5 py-3">
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                        blog.is_published === false
-                          ? "bg-gray-100 text-gray-500"
-                          : "bg-green-100 text-green-700"
+                        blog.is_published
+                          ? "bg-green-100 text-green-700"
+                          : "bg-gray-100 text-gray-500"
                       }`}
                     >
-                      {blog.is_published === false ? (
-                        <FileEdit className="w-3 h-3" />
-                      ) : (
+                      {blog.is_published ? (
                         <BookCheck className="w-3 h-3" />
+                      ) : (
+                        <FileEdit className="w-3 h-3" />
                       )}
-                      {blog.is_published === false ? "Draft" : "Published"}
+                      {blog.is_published ? "Published" : "Draft"}
                     </span>
                   </td>
                   <td className="px-5 py-3 text-right text-gray-500">
                     <span className="inline-flex items-center justify-end gap-1">
                       <Eye className="w-3.5 h-3.5 text-gray-400" />
-                      {blog.viewCount.toLocaleString()}
+                      {blog.view_count.toLocaleString()}
                     </span>
                   </td>
                 </tr>
