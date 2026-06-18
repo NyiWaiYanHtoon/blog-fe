@@ -23,7 +23,7 @@ export default function CommentList({ comments }) {
   return (
     <div className="space-y-4">
       {comments.map((comment) => {
-        const formattedDate = new Date(comment.createdAt).toLocaleDateString("en-GB", {
+        const formattedDate = new Date(comment.created_at).toLocaleDateString("en-GB", {
           day: "numeric",
           month: "short",
           year: "numeric",

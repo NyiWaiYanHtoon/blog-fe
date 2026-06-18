@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Eye, ChevronRight } from "lucide-react";
 
 export default function BlogCard({ blog }) {
-  const formattedDate = new Date(blog.createdAt).toLocaleDateString("en-GB", {
+  const formattedDate = new Date(blog.created_at).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",
