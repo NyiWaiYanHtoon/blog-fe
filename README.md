@@ -1,16 +1,39 @@
-# React + Vite
+# DevBlog — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite blog platform with public browsing and admin panel.
 
-Currently, two official plugins are available:
+## Live Demo
+https://blog-fe-black.vercel.app/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
+React, React Router DOM, Axios, Tailwind CSS, Vite, Lucide React
 
-## React Compiler
+## Features
+- Browse, search, paginate published blogs
+- Blog detail with cover image and gallery
+- Submit comments (Thai characters and numbers only)
+- Admin dashboard with blog and comment management
+- Image upload to Supabase Storage
+- JWT authentication
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Setup
 
-## Expanding the ESLint configuration
+```bash
+npm install
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Create `.env`:
+```env
+VITE_API_URL=https://blog-be-3emd.onrender.com/api
+```
+
+```bash
+npm run dev
+```
+
+## Admin Access
+URL:      /login
+Username: admin
+Password: admin1234
+
+Deployed on Vercel. Set `VITE_API_URL` in project environment variables.
