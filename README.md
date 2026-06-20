@@ -5,7 +5,7 @@ React + Vite blog platform with public browsing and admin panel.
 ## Live Demo
 https://blog-fe-black.vercel.app/
 
-for admin access
+for admin access -> 
 username: admin
 password: admin1234
 
