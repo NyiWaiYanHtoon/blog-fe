@@ -5,6 +5,10 @@ React + Vite blog platform with public browsing and admin panel.
 ## Live Demo
 https://blog-fe-black.vercel.app/
 
+for admin access
+username: admin
+password: admin1234
+
 ## Tech Stack
 React, React Router DOM, Axios, Tailwind CSS, Vite, Lucide React
 
