@@ -68,6 +68,9 @@ export default function BlogListPage() {
         {loading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+            <span className="text-sm text-gray-500">
+              Waking up the server — this takes a few seconds on first load
+            </span>
           </div>
         ) : (
           <BlogList blogs={blogs} />

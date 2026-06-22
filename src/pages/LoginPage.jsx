@@ -88,6 +88,31 @@ export default function LoginPage() {
             >
               Sign in
             </button>
+            {/* Add this right before the closing </form> tag, after the Sign in button */}
+
+            <div className="pt-1 border-t border-gray-100">
+              <p className="text-xs text-gray-400 text-center mb-2">
+                Demo purposes, use these credentials
+              </p>
+              <div className="flex gap-2 text-xs">
+                <div className="flex-1 bg-stone-50 border border-gray-100 rounded-lg px-3 py-2">
+                  <span className="text-gray-400 block leading-none mb-1">
+                    Username
+                  </span>
+                  <span className="font-mono text-gray-600 font-medium">
+                    admin
+                  </span>
+                </div>
+                <div className="flex-1 bg-stone-50 border border-gray-100 rounded-lg px-3 py-2">
+                  <span className="text-gray-400 block leading-none mb-1">
+                    Password
+                  </span>
+                  <span className="font-mono text-gray-600 font-medium">
+                    admin1234
+                  </span>
+                </div>
+              </div>
+            </div>
           </form>
         </div>
 
