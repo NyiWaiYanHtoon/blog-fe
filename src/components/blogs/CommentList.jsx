@@ -38,15 +38,15 @@ export default function CommentList({ comments }) {
             className="flex gap-3"
           >
             {/* Avatar */}
-            <div className="shrink-0 w-9 h-9 rounded-full bg-navy/10 flex items-center justify-center text-sm font-semibold text-navy">
+            <div className="shrink-0 w-9 h-9 rounded-full bg-zinc-400 flex items-center justify-center text-sm font-semibold text-zinc-900">
               {initial}
             </div>
 
             {/* Bubble */}
             <div className="flex-1 bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3">
               <div className="flex items-baseline justify-between gap-2 mb-1">
-                <span className="text-sm font-semibold text-navy">
-                  {comment.authorName}
+                <span className="text-sm font-semibold text-zinc-900">
+                  {comment.author_name}
                 </span>
                 <span className="text-xs text-gray-400 shrink-0">{formattedDate}</span>
               </div>
